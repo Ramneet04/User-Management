@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button } from '../ui/button'
 import {
     Dialog,
@@ -13,7 +13,7 @@ import {
   import { Input } from "@/components/ui/input"
   import { Label } from "@/components/ui/label"
 import { addNewUserFormControlls, initialState } from '@/utils'
-import { addNewUser } from '@/app/actions'
+import { addNewUser, getUsers } from '@/app/actions'
 const AddNewUser = () => {
     const [openPopUp, setOpenPopUp] = useState(false);
     const [addNewUserFormData, setAddNewUserFormData] = useState(initialState);
@@ -21,7 +21,7 @@ const AddNewUser = () => {
         return Object.keys(addNewUserFormData).every((key=>addNewUserFormData[key].trim()!==''));
     }
     const handleAddNewUserAction = async ()=>{
-        const result = await addNewUser(addNewUserFormData);
+        const result = await addNewUser(addNewUserFormData, "/");
         console.log(result);
         setAddNewUserFormData(initialState);
         setOpenPopUp(false);
