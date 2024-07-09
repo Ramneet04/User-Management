@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Button } from '../ui/button'
 import {
     Dialog,
@@ -13,18 +13,27 @@ import {
   import { Input } from "@/components/ui/input"
   import { Label } from "@/components/ui/label"
 import { addNewUserFormControlls, initialState } from '@/utils'
-import { addNewUser, getUsers } from '@/app/actions'
+import { addNewUser, editUser, getUsers } from '@/app/actions'
+import { UserContext } from '@/context'
 const AddNewUser = () => {
-    const [openPopUp, setOpenPopUp] = useState(false);
-    const [addNewUserFormData, setAddNewUserFormData] = useState(initialState);
+  const {currentEditedId,setCurrentEditedId,openPopUp, setOpenPopUp,addNewUserFormData, setAddNewUserFormData} = useContext(UserContext);
     function handleSaveButton(){
         return Object.keys(addNewUserFormData).every((key=>addNewUserFormData[key].trim()!==''));
     }
     const handleAddNewUserAction = async ()=>{
+      if(!currentEditedId){
         const result = await addNewUser(addNewUserFormData, "/");
         console.log(result);
         setAddNewUserFormData(initialState);
         setOpenPopUp(false);
+      }
+      else{
+        const result = await editUser(currentEditedId,addNewUserFormData,"/");
+        console.log(result);
+        setCurrentEditedId(null);
+        setOpenPopUp(false);
+        setAddNewUserFormData(initialState);
+      }
     }
   return (
     <div>
@@ -32,10 +41,12 @@ const AddNewUser = () => {
         <Dialog open={openPopUp} onOpenChange={()=>{
             setOpenPopUp(!openPopUp);
             setAddNewUserFormData(initialState);
+            setCurrentEditedId(null);
         }}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add User</DialogTitle>
+          <DialogTitle>{currentEditedId ? "Edit User" : "Add New User"}</DialogTitle>
+
         </DialogHeader>
         <form action={handleAddNewUserAction} className="grid gap-6 py-4">
           <div className="">

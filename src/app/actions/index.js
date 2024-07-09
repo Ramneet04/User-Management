@@ -91,3 +91,48 @@ export async function deleteUser(id, pathToRevalidate){
         }
     }
 }
+
+export async function editUser(id,data, pathToRevalidate){
+    await connectToDB();
+    try {
+        if(!id){
+            return {
+                status: 400,
+                message: "Invalid id",
+                success:false,
+            }
+        }
+        const getUser = await User.findById(id);
+        if(!getUser){
+            return {
+                status: 404,
+                message: "User not found",
+                success:false,
+            }
+        }
+        const updadtedUser = await User.findByIdAndUpdate(id,{
+            $set: data,
+        })
+        if(updadtedUser){
+            revalidatePath(pathToRevalidate);
+            return {
+                status: 200,
+                message: "User updated successfully",
+                success:true,
+            }
+        }
+        else{
+            return {
+                status: 500,
+                message: "Something went wrong",
+                success:false,
+            }
+        }
+    } catch (error) {
+        return {
+            status: 500,
+            message: "Internal Server Error",
+            success:false,
+        }
+    }
+}
